@@ -1,29 +1,3 @@
-export type Unit = "celsius" | "fahrenheit";
-
-export interface City {
-  id: number;
-  name: string;
-  country?: string;
-  admin1?: string;
-  latitude: number;
-  longitude: number;
-}
-
-export interface Config {
-  unit: Unit;
-  defaultCityId: number | null;
-  cities: City[];
-}
-
-export interface GeocodingResult {
-  id?: number;
-  name?: string;
-  country?: string;
-  admin1?: string;
-  latitude?: number;
-  longitude?: number;
-}
-
 export interface CurrentWeather {
   time: string;
   temperature_2m: number;

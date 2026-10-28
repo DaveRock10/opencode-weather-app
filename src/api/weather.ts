@@ -1,16 +1,8 @@
-import type { City, CurrentWeather, DailyWeather, Forecast, GeocodingResult, Unit } from "./types.ts";
-
-const GEOCODING_URL = "https://geocoding-api.open-meteo.com/v1/search";
-const FORECAST_URL = "https://api.open-meteo.com/v1/forecast";
-const TIMEOUT_MS = 10_000;
-
-export class ApiError extends Error {
-  override name = "ApiError";
-}
-
-interface GeocodingResponse {
-  results?: GeocodingResult[];
-}
+import type { City } from "../types/City.ts";
+import type { Unit } from "../types/Config.ts";
+import type { CurrentWeather, DailyWeather, Forecast } from "../types/Weather.ts";
+import { FORECAST_DAYS, FORECAST_URL } from "../utils/constants.ts";
+import { ApiError, fetchJson } from "./client.ts";
 
 interface RawCurrentWeather {
   time?: string;
@@ -37,54 +29,6 @@ interface ForecastResponse {
   daily?: RawDailyWeather;
 }
 
-async function fetchJson<T>(url: URL): Promise<T> {
-  let response: Response;
-  try {
-    response = await fetch(url, { signal: AbortSignal.timeout(TIMEOUT_MS) });
-  } catch (error) {
-    const name = error instanceof Error ? error.name : "";
-    if (name === "TimeoutError" || name === "AbortError") {
-      throw new ApiError("La solicitud tardó demasiado. Inténtalo de nuevo.");
-    }
-    throw new ApiError("No se pudo conectar con Open-Meteo. Revisa tu conexión a internet.");
-  }
-
-  if (!response.ok) {
-    throw new ApiError(`Open-Meteo respondió con un error HTTP ${response.status}.`);
-  }
-
-  try {
-    return (await response.json()) as T;
-  } catch {
-    throw new ApiError("Open-Meteo devolvió una respuesta que no se pudo leer.");
-  }
-}
-
-export async function geocodeCity(query: string): Promise<City | null> {
-  const name = query.trim();
-  if (!name) return null;
-
-  const url = new URL(GEOCODING_URL);
-  url.searchParams.set("name", name);
-  url.searchParams.set("count", "1");
-  url.searchParams.set("language", "es");
-  url.searchParams.set("format", "json");
-
-  const data = await fetchJson<GeocodingResponse>(url);
-  const result = data.results?.[0];
-  if (!result) return null;
-
-  const { id, latitude, longitude } = result;
-  if (typeof id !== "number" || typeof result.name !== "string" || typeof latitude !== "number" || typeof longitude !== "number") {
-    return null;
-  }
-
-  const city: City = { id, name: result.name, latitude, longitude };
-  if (typeof result.country === "string") city.country = result.country;
-  if (typeof result.admin1 === "string") city.admin1 = result.admin1;
-  return city;
-}
-
 export async function fetchForecast(city: City, unit: Unit): Promise<Forecast> {
   const url = new URL(FORECAST_URL);
   url.searchParams.set("latitude", String(city.latitude));
@@ -95,7 +39,7 @@ export async function fetchForecast(city: City, unit: Unit): Promise<Forecast> {
   );
   url.searchParams.set("daily", "weather_code,temperature_2m_max,temperature_2m_min");
   url.searchParams.set("timezone", "auto");
-  url.searchParams.set("forecast_days", "7");
+  url.searchParams.set("forecast_days", String(FORECAST_DAYS));
   if (unit === "fahrenheit") url.searchParams.set("temperature_unit", "fahrenheit");
 
   const data = await fetchJson<ForecastResponse>(url);

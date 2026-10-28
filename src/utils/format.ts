@@ -1,5 +1,7 @@
-import { style } from "./theme.ts";
-import type { City, Forecast, Unit } from "./types.ts";
+import type { City } from "../types/City.ts";
+import type { Unit } from "../types/Config.ts";
+import type { Forecast } from "../types/Weather.ts";
+import { style } from "./colors.ts";
 
 export interface Condition {
   text: string;

@@ -1,14 +1,8 @@
-import { handleChoice } from "./menu.ts";
-import { loadConfig } from "./storage.ts";
-import { style } from "./theme.ts";
-import {
-  ask,
-  closeReadline,
-  inputClosed,
-  pause,
-  printError,
-  renderMenu,
-} from "./ui.ts";
+import { handleChoice, renderMenu } from "./presentation/menu.ts";
+import { ask, closeReadline, inputClosed, pause } from "./presentation/input.ts";
+import { printError } from "./presentation/output.ts";
+import { loadConfig } from "./storage/settingsStorage.ts";
+import { style } from "./utils/colors.ts";
 
 async function main(): Promise<void> {
   const config = await loadConfig();

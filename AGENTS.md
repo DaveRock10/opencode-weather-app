@@ -10,13 +10,12 @@
 ## Project structure
 
 - `src/index.ts` — menu loop and global error handling.
-- `src/menu.ts` — actions for each menu option.
-- `src/ui.ts` — prompts, menu rendering, messages and pauses.
-- `src/theme.ts` — ANSI palette and color detection.
-- `src/api.ts` — OpenMeteo geocoding and forecast clients.
-- `src/storage.ts` — config load/save in `~/.weather-cli.json`.
-- `src/format.ts` — units, dates, weather conditions and render helpers.
-- `src/types.ts` — shared types.
+- `src/actions/` — one file per user action: `getWeather.ts`, `getAllWeather.ts`, `addCity.ts`, `removeCity.ts`, `setDefaultCity.ts`, `listCities.ts`, `changeUnits.ts`.
+- `src/presentation/` — `menu.ts` (rendering and option dispatch), `input.ts` (readline, prompts, validation), `output.ts` (messages and city listing).
+- `src/storage/` — `settingsStorage.ts` (config load/save in `~/.weather-cli.json`) and `citiesStorage.ts` (city add/remove/default operations).
+- `src/api/` — `client.ts` (shared fetch + `ApiError`), `geocoding.ts`, `weather.ts`.
+- `src/utils/` — `format.ts` (units, dates, conditions and render helpers), `constants.ts`, `colors.ts` (ANSI palette and color detection).
+- `src/types/` — `City.ts`, `Config.ts`, `Weather.ts`, `MenuOption.ts`.
 
 ## TypeScript gotchas
 
@@ -26,7 +25,7 @@
 
 ## App behavior
 
-- Spanish UI CLI. Menu numbering matches the README: 1–5, 8. Ajustes, 9. Salir.
+- Spanish UI CLI. Menu numbering matches the README: 1–6, 8. Ajustes, 9. Salir.
 - Config is stored in `~/.weather-cli.json` and written atomically:
 ```json
 {
@@ -41,7 +40,7 @@
 - OpenMeteo flow (no API key):
   1. Geocode: `https://geocoding-api.open-meteo.com/v1/search?name=<city>&count=1&language=es&format=json`
   2. Forecast: `https://api.open-meteo.com/v1/forecast?latitude=<lat>&longitude=<lon>&current=temperature_2m,weather_code,wind_speed_10m,relative_humidity_2m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=7`
-- Features: default city weather, all-cities summary, add/remove/set-default, °C/°F units, current weather + 7-day forecast, quit.
+- Features: default city weather, all-cities summary, add/remove/list/set-default cities, °C/°F units, current weather + 7-day forecast, quit.
 - Network errors are shown in Spanish; one failing city does not abort the all-cities query.
 - Colors: cyan for menu and prompts, yellow for temperatures, green for success, red for errors. Respect `NO_COLOR`; `FORCE_COLOR` forces colors for testing. Piped output stays plain unless forced.
 - Keep all UI text in Spanish.

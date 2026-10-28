@@ -1,9 +1,11 @@
 import { readFile, rename, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import type { City, Config, Unit } from "./types.ts";
+import type { City } from "../types/City.ts";
+import type { Config, Unit } from "../types/Config.ts";
+import { CONFIG_FILE } from "../utils/constants.ts";
 
-const CONFIG_PATH = join(homedir(), ".weather-cli.json");
+const CONFIG_PATH = join(homedir(), CONFIG_FILE);
 const TEMP_PATH = `${CONFIG_PATH}.tmp`;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
