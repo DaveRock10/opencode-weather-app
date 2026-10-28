@@ -6,6 +6,7 @@ import {
   unitSymbol,
 } from "./format.ts";
 import { saveConfig } from "./storage.ts";
+import { style } from "./theme.ts";
 import type { City, Config, Unit } from "./types.ts";
 import {
   ask,
@@ -13,7 +14,6 @@ import {
   pause,
   printSuccess,
   printWarning,
-  style,
 } from "./ui.ts";
 
 function parseIndex(input: string, length: number): number | null {
@@ -24,7 +24,7 @@ function parseIndex(input: string, length: number): number | null {
 
 function listCities(cities: City[]): void {
   cities.forEach((city, index) => {
-    console.log(`  ${index + 1}. ${cityLabel(city)}`);
+    console.log(`  ${style.cyan(`${index + 1}.`)} ${cityLabel(city)}`);
   });
 }
 
@@ -183,9 +183,9 @@ async function changeUnits(config: Config): Promise<void> {
   console.log(style.bold("  Ajustes de unidades"));
   console.log(bar);
   console.log(`  Unidad actual: ${style.cyan(unitSymbol(config.unit))}`);
-  console.log("  1. Celsius (°C)");
-  console.log("  2. Fahrenheit (°F)");
-  console.log("  0. Volver");
+  console.log(`  ${style.cyan("1.")} Celsius (°C)`);
+  console.log(`  ${style.cyan("2.")} Fahrenheit (°F)`);
+  console.log(`  ${style.cyan("0.")} Volver`);
   console.log(bar);
 
   const input = await ask("  Selecciona una opción: ");

@@ -1,5 +1,6 @@
 import { handleChoice } from "./menu.ts";
 import { loadConfig } from "./storage.ts";
+import { style } from "./theme.ts";
 import {
   ask,
   closeReadline,
@@ -7,7 +8,6 @@ import {
   pause,
   printError,
   renderMenu,
-  style,
 } from "./ui.ts";
 
 async function main(): Promise<void> {

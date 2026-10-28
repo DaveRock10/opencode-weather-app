@@ -1,22 +1,9 @@
 import { createInterface, type Interface } from "node:readline";
 import { unitSymbol } from "./format.ts";
+import { style } from "./theme.ts";
 import type { Config } from "./types.ts";
 
 const WIDTH = 40;
-const useColor = !process.env.NO_COLOR && process.stdout.isTTY === true;
-
-function paint(code: string, text: string): string {
-  return useColor ? `\u001b[${code}m${text}\u001b[0m` : text;
-}
-
-export const style = {
-  bold: (text: string) => paint("1", text),
-  dim: (text: string) => paint("2", text),
-  cyan: (text: string) => paint("36", text),
-  green: (text: string) => paint("32", text),
-  yellow: (text: string) => paint("33", text),
-  red: (text: string) => paint("31", text),
-};
 
 let rl: Interface | undefined;
 let closed = false;
@@ -62,10 +49,13 @@ export function inputClosed(): boolean {
   return closed && pending.length === 0;
 }
 
-export async function ask(prompt: string): Promise<string> {
+export async function ask(
+  prompt: string,
+  paintPrompt: (text: string) => string = style.cyan,
+): Promise<string> {
   if (closed && pending.length === 0) return "";
   readline();
-  process.stdout.write(prompt);
+  process.stdout.write(paintPrompt(prompt));
   return (await nextLine()).trim();
 }
 
@@ -79,7 +69,7 @@ export function closeReadline(): void {
 
 export async function pause(): Promise<void> {
   if (inputClosed()) return;
-  await ask(style.dim("\n  Presiona Enter para continuar..."));
+  await ask("\n  Presiona Enter para continuar...", style.dim);
 }
 
 export function clearScreen(): void {
@@ -95,15 +85,15 @@ export function renderMenu(config: Config): void {
   const bar = style.cyan("═".repeat(WIDTH));
   clearScreen();
   console.log(bar);
-  console.log(style.bold(center("WEATHER CLI", WIDTH)));
+  console.log(style.bold(style.cyan(center("WEATHER CLI", WIDTH))));
   console.log(bar);
-  console.log("  1. Clima de ciudad default");
-  console.log(`  2. Clima de todas las ciudades (${config.cities.length})`);
-  console.log("  3. Buscar y agregar ciudad");
-  console.log("  4. Eliminar ciudad");
-  console.log("  5. Establecer ciudad default");
-  console.log(`  8. Ajustes (${unitSymbol(config.unit)})`);
-  console.log("  9. Salir");
+  console.log(`  ${style.cyan("1.")} Clima de ciudad default`);
+  console.log(`  ${style.cyan("2.")} Clima de todas las ciudades (${config.cities.length})`);
+  console.log(`  ${style.cyan("3.")} Buscar y agregar ciudad`);
+  console.log(`  ${style.cyan("4.")} Eliminar ciudad`);
+  console.log(`  ${style.cyan("5.")} Establecer ciudad default`);
+  console.log(`  ${style.cyan("8.")} Ajustes (${unitSymbol(config.unit)})`);
+  console.log(`  ${style.cyan("9.")} Salir`);
   console.log(bar);
 }
 

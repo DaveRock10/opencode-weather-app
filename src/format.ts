@@ -1,3 +1,4 @@
+import { style } from "./theme.ts";
 import type { City, Forecast, Unit } from "./types.ts";
 
 export interface Condition {
@@ -60,7 +61,7 @@ export function unitSymbol(unit: Unit): string {
 }
 
 export function formatTemperature(value: number, unit: Unit): string {
-  return `${numberFormat.format(value)} ${unitSymbol(unit)}`;
+  return style.yellow(`${numberFormat.format(value)} ${unitSymbol(unit)}`);
 }
 
 export function formatDay(isoDate: string, index: number): string {
