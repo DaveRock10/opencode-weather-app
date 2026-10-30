@@ -43,6 +43,25 @@ También puedes ejecutar `bun test --isolate tests` directamente. `--isolate` es
 
 `bun run build` ejecuta las pruebas primero; si alguna falla, no se genera el binario.
 
+## Releases
+
+El workflow `.github/workflows/release.yml` crea el tag y el release de GitHub automáticamente:
+
+1. Actualiza `version` en `package.json` (por ejemplo, `1.0.1`).
+2. Haz push a `main`. El workflow solo se dispara cuando cambia `package.json`.
+3. El Action ejecuta `bun run build` y compila los binarios para Linux, macOS y Windows.
+4. Se publica el release `v<version>` con los binarios adjuntos.
+
+Si el tag `v<version>` ya existe, el workflow termina sin crear un release duplicado. También se puede lanzar manualmente desde la pestaña **Actions** (`workflow_dispatch`).
+
+Binarios publicados:
+
+- `weather-linux-x64`
+- `weather-linux-arm64`
+- `weather-darwin-arm64`
+- `weather-darwin-x64`
+- `weather-windows-x64.exe`
+
 ### Ejemplo del menú
 
 Esta es la apariencia que deseamos crear
