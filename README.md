@@ -29,6 +29,20 @@ https://api.open-meteo.com/v1/forecast?latitude=45.41117&longitude=-75.69812&cur
 bun init
 ```
 
+## Testing
+
+La suite usa el runner integrado de Bun y vive en `tests/`:
+
+```bash
+bun run test         # ejecuta todas las pruebas
+bun run test:watch   # modo vigilancia
+bun run test:coverage # reporte de cobertura
+```
+
+También puedes ejecutar `bun test --isolate tests` directamente. `--isolate` es necesario para que los mocks de módulos no se filtren entre archivos.
+
+`bun run build` ejecuta las pruebas primero; si alguna falla, no se genera el binario.
+
 ### Ejemplo del menú
 
 Esta es la apariencia que deseamos crear

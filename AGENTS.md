@@ -16,6 +16,7 @@
 - `src/api/` — `client.ts` (shared fetch + `ApiError`), `geocoding.ts`, `weather.ts`.
 - `src/utils/` — `format.ts` (units, dates, conditions and render helpers), `constants.ts`, `colors.ts` (ANSI palette and color detection).
 - `src/types/` — `City.ts`, `Config.ts`, `Weather.ts`, `MenuOption.ts`.
+- `tests/` — Bun test suites mirroring `src/`, plus `helpers/` (fixtures, fetch mock, temp dirs, subprocess runner) and `integration/cli.test.ts`.
 
 ## TypeScript gotchas
 
@@ -45,9 +46,20 @@
 - Colors: cyan for menu and prompts, yellow for temperatures, green for success, red for errors. Respect `NO_COLOR`; `FORCE_COLOR` forces colors for testing. Piped output stays plain unless forced.
 - Keep all UI text in Spanish.
 
+## Testing
+
+- `bun test --isolate tests` runs the full suite; `bun test --isolate --watch tests` and `bun test --isolate --coverage tests` are available as `bun run test:watch` and `bun run test:coverage`.
+- Tests live in `tests/` and mirror the `src/` layout. Use `*.test.ts` for suites and keep reusable code in `tests/helpers/`.
+- Never call the real Open-Meteo API: mock `globalThis.fetch` with `tests/helpers/fetchMock.ts`.
+- Never touch the user's `~/.weather-cli.json`: storage tests pass a temporary file path to `loadConfig`/`saveConfig`, and CLI integration tests spawn the app with `HOME`/`USERPROFILE` pointing to a temp directory.
+- Action/menu suites use `mock.module` with absolute paths from `tests/helpers/mockPath.ts`; import the module under test dynamically and call `mock.restore()` when done.
+- `--isolate` is required: module mocks must not leak between test files.
+- `bun check` also typechecks `tests/`.
+
 ## Build
 
-- `bun run build` compiles a standalone binary: `weather.exe` on Windows, `weather` on Unix/Linux.
+- `bun run build` runs `bun test --isolate tests` first and only compiles if the suite passes.
+- It produces a standalone binary: `weather.exe` on Windows, `weather` on Unix/Linux.
 - The binary runs without Bun installed. Both artifacts are gitignored.
 
 ## Notes

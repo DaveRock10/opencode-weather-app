@@ -7,7 +7,11 @@
     "start": "bun run src/index.ts",
     "dev": "bun run src/index.ts --watch",
     "typecheck": "bun check",
-    "build": "bun build --compile src/index.ts --outfile weather"
+    "test": "bun test --isolate tests",
+    "test:watch": "bun test --isolate --watch tests",
+    "test:coverage": "bun test --isolate --coverage tests",
+    "verify": "bun check && bun test --isolate tests",
+    "build": "bun test --isolate tests && bun build --compile src/index.ts --outfile weather"
   },
   "devDependencies": {
     "@types/bun": "latest"

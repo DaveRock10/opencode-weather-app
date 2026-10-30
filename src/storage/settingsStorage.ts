@@ -6,7 +6,6 @@ import type { Config, Unit } from "../types/Config.ts";
 import { CONFIG_FILE } from "../utils/constants.ts";
 
 const CONFIG_PATH = join(homedir(), CONFIG_FILE);
-const TEMP_PATH = `${CONFIG_PATH}.tmp`;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -20,7 +19,7 @@ function defaultConfig(): Config {
   return { unit: "celsius", defaultCityId: null, cities: [] };
 }
 
-function toCity(value: unknown): City | null {
+export function toCity(value: unknown): City | null {
   if (!isRecord(value)) return null;
 
   const { id, name, latitude, longitude } = value;
@@ -33,7 +32,7 @@ function toCity(value: unknown): City | null {
   return city;
 }
 
-function normalizeConfig(value: unknown): Config {
+export function normalizeConfig(value: unknown): Config {
   if (!isRecord(value)) return defaultConfig();
 
   const cities: City[] = [];
@@ -52,21 +51,22 @@ function normalizeConfig(value: unknown): Config {
   return { unit, defaultCityId, cities };
 }
 
-export async function loadConfig(): Promise<Config> {
+export async function loadConfig(filePath: string = CONFIG_PATH): Promise<Config> {
   try {
-    const text = await readFile(CONFIG_PATH, "utf8");
+    const text = await readFile(filePath, "utf8");
     return normalizeConfig(JSON.parse(text) as unknown);
   } catch {
     return defaultConfig();
   }
 }
 
-export async function saveConfig(config: Config): Promise<void> {
+export async function saveConfig(config: Config, filePath: string = CONFIG_PATH): Promise<void> {
+  const tempPath = `${filePath}.tmp`;
   try {
-    await writeFile(TEMP_PATH, `${JSON.stringify(config, null, 2)}\n`, "utf8");
-    await rename(TEMP_PATH, CONFIG_PATH);
+    await writeFile(tempPath, `${JSON.stringify(config, null, 2)}\n`, "utf8");
+    await rename(tempPath, filePath);
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error);
-    throw new Error(`No se pudo guardar la configuración en ${CONFIG_PATH}: ${detail}`);
+    throw new Error(`No se pudo guardar la configuración en ${filePath}: ${detail}`);
   }
 }
